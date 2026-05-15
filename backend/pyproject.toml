@@ -53,9 +53,10 @@ select = [
     "C4",     # flake8-comprehensions
     "UP",     # pyupgrade
     "DJ",     # flake8-django
-    "N", # pep8-naming
+    "N",      # pep8-naming
+    "ANN",    # flake8-annotations
 ]
-ignore = ["E501"]
+ignore = ["E501","ANN101","ANN102"]
 
 [tool.ruff.lint.pep8-naming]
 ignore-names = ["_", "i", "j", "k"]
