@@ -43,6 +43,24 @@ notebooks = [
 target-version = "py311"
 line-length = 88
 
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    "data",
+    "calcul_itn_old.py",
+    "calcul_itn_back.py",
+    "data_sources",
+    "tests",
+    "models.py",
+    "test_temperature_records_business.py",
+    "test_temperature_deviation_graph_business.py",
+    "test_temperature_deviation_overview_business.py",
+    "test_temperature_deviation_graph_acceptance.py",
+    "test_national_indicator_kpi_business.py",
+    "test_timescale_records_business.py",
+    "test_temperature_records_classe_filter.py",
+    "test_temperature_deviation_station_lifecycle_filter.py"
+]
+
 [tool.ruff.lint]
 select = [
     "E",      # pycodestyle errors
