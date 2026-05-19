@@ -137,11 +137,11 @@ def build_station_info_from_text(
 
 def get_meteofrance_data_dict(
     *,
-    update=False,
-    itn_only=False,
-    max_pdfs=DEFAULT_MAX_PDFS_TO_READ,
-    keep_pdf=False,
-    parallelism=1,
+    update: bool = False,
+    itn_only: bool = False,
+    max_pdfs: int | None = DEFAULT_MAX_PDFS_TO_READ,
+    keep_pdf: bool = False,
+    parallelism: int = 1,
 ) -> dict[StationCode, StationInfo]:
     data_dict: dict[StationCode, StationInfo] = {}
     script_dir = Path(__file__).parent

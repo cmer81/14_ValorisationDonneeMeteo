@@ -13,7 +13,7 @@ from weather.services.national_indicator.types import (
 
 
 class StubObservedDataSource(NationalIndicatorBaselineDataSource):
-    def __init__(self, points: list[ObservedPoint]):
+    def __init__(self, points: list[ObservedPoint]) -> None:
         self._points = points
 
     def fetch_daily_series(self, _query) -> list[ObservedPoint]:
@@ -21,7 +21,7 @@ class StubObservedDataSource(NationalIndicatorBaselineDataSource):
 
 
 class StubBaselineDataSource(NationalIndicatorBaselineDataSource):
-    def __init__(self, baselines: dict[tuple[int, int], BaselinePoint]):
+    def __init__(self, baselines: dict[tuple[int, int], BaselinePoint]) -> None:
         self._baselines = baselines
 
     def fetch_daily_baseline(self, day: dt.date) -> BaselinePoint:
@@ -38,7 +38,7 @@ def _baseline(mean: float, std_dev: float) -> BaselinePoint:
 
 # Stub qui retourne un point fixe pour n'importe quelle date
 class AnyDateObservedDataSource(NationalIndicatorBaselineDataSource):
-    def __init__(self, temperature: float):
+    def __init__(self, temperature: float) -> None:
         self._temperature = temperature
 
     def fetch_daily_series(self, query) -> list[ObservedPoint]:
@@ -52,7 +52,7 @@ class AnyDateObservedDataSource(NationalIndicatorBaselineDataSource):
 
 
 class AnyDateBaselineDataSource(NationalIndicatorBaselineDataSource):
-    def __init__(self, mean: float, std_dev: float):
+    def __init__(self, mean: float, std_dev: float) -> BaselinePoint:
         self._baseline = _baseline(mean, std_dev)
 
     def fetch_daily_baseline(self, _day: dt.date) -> BaselinePoint:
@@ -62,7 +62,7 @@ class AnyDateBaselineDataSource(NationalIndicatorBaselineDataSource):
 # ─── Tests : pic chaud ────────────────────────────────────────────────────────
 
 
-def test_hot_peak_detected_when_temperature_exceeds_upper_bound():
+def test_hot_peak_detected_when_temperature_exceeds_upper_bound() -> None:
     observed = [ObservedPoint(date=dt.date(2024, 7, 15), temperature=25.0)]
     baselines = {(7, 15): _baseline(mean=20.0, std_dev=2.0)}  # upper = 22.0
 
@@ -76,7 +76,7 @@ def test_hot_peak_detected_when_temperature_exceeds_upper_bound():
     assert result.current.hot_peak_count == 1
 
 
-def test_hot_peak_not_detected_when_temperature_below_upper_bound():
+def test_hot_peak_not_detected_when_temperature_below_upper_bound() -> None:
     observed = [ObservedPoint(date=dt.date(2024, 7, 15), temperature=21.0)]
     baselines = {(7, 15): _baseline(mean=20.0, std_dev=2.0)}  # upper = 22.0
 
@@ -90,7 +90,7 @@ def test_hot_peak_not_detected_when_temperature_below_upper_bound():
     assert result.current.hot_peak_count == 0
 
 
-def test_hot_peak_not_detected_when_temperature_equals_upper_bound():
+def test_hot_peak_not_detected_when_temperature_equals_upper_bound() -> None:
     observed = [ObservedPoint(date=dt.date(2024, 7, 15), temperature=22.0)]
     baselines = {(7, 15): _baseline(mean=20.0, std_dev=2.0)}  # upper = 22.0
 
@@ -107,7 +107,7 @@ def test_hot_peak_not_detected_when_temperature_equals_upper_bound():
 # ─── Tests : pic froid ────────────────────────────────────────────────────────
 
 
-def test_cold_peak_detected_when_temperature_below_lower_bound():
+def test_cold_peak_detected_when_temperature_below_lower_bound() -> None:
     observed = [ObservedPoint(date=dt.date(2024, 1, 10), temperature=3.0)]
     baselines = {(1, 10): _baseline(mean=8.0, std_dev=2.0)}  # lower = 6.0
 
@@ -121,7 +121,7 @@ def test_cold_peak_detected_when_temperature_below_lower_bound():
     assert result.current.cold_peak_count == 1
 
 
-def test_cold_peak_not_detected_when_temperature_above_lower_bound():
+def test_cold_peak_not_detected_when_temperature_above_lower_bound() -> None:
     observed = [ObservedPoint(date=dt.date(2024, 1, 10), temperature=7.0)]
     baselines = {(1, 10): _baseline(mean=8.0, std_dev=2.0)}  # lower = 6.0
 
@@ -138,7 +138,7 @@ def test_cold_peak_not_detected_when_temperature_above_lower_bound():
 # ─── Tests : isolation hot / cold ─────────────────────────────────────────────
 
 
-def test_cold_day_does_not_appear_in_hot_peak_count():
+def test_cold_day_does_not_appear_in_hot_peak_count() -> None:
     observed = [ObservedPoint(date=dt.date(2024, 1, 10), temperature=3.0)]
     baselines = {(1, 10): _baseline(mean=8.0, std_dev=2.0)}  # lower=6, upper=10
 
@@ -153,7 +153,7 @@ def test_cold_day_does_not_appear_in_hot_peak_count():
     assert result.current.cold_peak_count == 1
 
 
-def test_hot_day_does_not_appear_in_cold_peak_count():
+def test_hot_day_does_not_appear_in_cold_peak_count() -> None:
     observed = [ObservedPoint(date=dt.date(2024, 7, 15), temperature=25.0)]
     baselines = {(7, 15): _baseline(mean=20.0, std_dev=2.0)}  # lower=18, upper=22
 
@@ -168,7 +168,7 @@ def test_hot_day_does_not_appear_in_cold_peak_count():
     assert result.current.hot_peak_count == 1
 
 
-def test_hot_and_cold_peaks_returned_simultaneously():
+def test_hot_and_cold_peaks_returned_simultaneously() -> None:
     result = get_national_indicator_kpi(
         observed_data_source=AnyDateObservedDataSource(temperature=25.0),
         baseline_data_source=AnyDateBaselineDataSource(mean=20.0, std_dev=2.0),
@@ -189,7 +189,7 @@ def test_hot_and_cold_peaks_returned_simultaneously():
 # ─── Tests : période précédente ───────────────────────────────────────────────
 
 
-def test_previous_period_dates_are_correct():
+def test_previous_period_dates_are_correct() -> None:
     # current : 2024-01-10 → 2024-01-14 (5 jours)
     # previous : 2024-01-05 → 2024-01-09 (5 jours)
     calls: list[tuple[dt.date, dt.date]] = []
@@ -212,7 +212,7 @@ def test_previous_period_dates_are_correct():
     assert result.previous.itn_mean is None
 
 
-def test_previous_period_computes_independent_stats():
+def test_previous_period_computes_independent_stats() -> None:
     # current (2024-01-10) : température 25 → pic chaud
     # previous (2024-01-09) : température 5 → pic froid
     baselines = {
@@ -248,7 +248,7 @@ def test_previous_period_computes_independent_stats():
 # ─── Tests : plusieurs jours ──────────────────────────────────────────────────
 
 
-def test_only_peak_days_counted_over_multiple_days():
+def test_only_peak_days_counted_over_multiple_days() -> None:
     observed = [
         ObservedPoint(date=dt.date(2024, 7, 1), temperature=23.0),  # pic (upper=22)
         ObservedPoint(date=dt.date(2024, 7, 2), temperature=21.0),  # normal
@@ -267,7 +267,7 @@ def test_only_peak_days_counted_over_multiple_days():
     assert result.current.hot_peak_count == 2
 
 
-def test_empty_observed_series_returns_zero_counts():
+def test_empty_observed_series_returns_zero_counts() -> None:
     result = get_national_indicator_kpi(
         observed_data_source=AnyDateObservedDataSource(temperature=10.0),
         baseline_data_source=AnyDateBaselineDataSource(mean=10.0, std_dev=2.0),
@@ -282,7 +282,7 @@ def test_empty_observed_series_returns_zero_counts():
 # ─── Tests : days_above_baseline / days_below_baseline ───────────────────────
 
 
-def test_days_above_baseline_counts_days_with_positive_deviation():
+def test_days_above_baseline_counts_days_with_positive_deviation() -> None:
     result = get_national_indicator_kpi(
         observed_data_source=AnyDateObservedDataSource(temperature=21.0),
         baseline_data_source=AnyDateBaselineDataSource(mean=20.0, std_dev=2.0),
@@ -293,7 +293,7 @@ def test_days_above_baseline_counts_days_with_positive_deviation():
     assert result.current.days_below_baseline == 0
 
 
-def test_days_below_baseline_counts_days_with_negative_deviation():
+def test_days_below_baseline_counts_days_with_negative_deviation() -> None:
     result = get_national_indicator_kpi(
         observed_data_source=AnyDateObservedDataSource(temperature=19.0),
         baseline_data_source=AnyDateBaselineDataSource(mean=20.0, std_dev=2.0),
@@ -307,7 +307,7 @@ def test_days_below_baseline_counts_days_with_negative_deviation():
 # ─── Tests : itn_mean ─────────────────────────────────────────────────────────
 
 
-def test_itn_mean_is_average_of_all_observed_days():
+def test_itn_mean_is_average_of_all_observed_days() -> None:
     observed = [
         ObservedPoint(date=dt.date(2024, 7, 1), temperature=10.0),
         ObservedPoint(date=dt.date(2024, 7, 2), temperature=20.0),
@@ -326,7 +326,7 @@ def test_itn_mean_is_average_of_all_observed_days():
     assert result.current.itn_mean == 20.0
 
 
-def test_itn_mean_is_none_when_observed_series_is_empty():
+def test_itn_mean_is_none_when_observed_series_is_empty() -> None:
     result = get_national_indicator_kpi(
         observed_data_source=StubObservedDataSource([]),
         baseline_data_source=StubBaselineDataSource({}),
@@ -340,7 +340,7 @@ def test_itn_mean_is_none_when_observed_series_is_empty():
 # ─── Tests : deviation_from_normal ────────────────────────────────────────────
 
 
-def test_deviation_from_normal_positive_when_warmer_than_baseline():
+def test_deviation_from_normal_positive_when_warmer_than_baseline() -> None:
     result = get_national_indicator_kpi(
         observed_data_source=AnyDateObservedDataSource(temperature=23.0),
         baseline_data_source=AnyDateBaselineDataSource(mean=20.0, std_dev=2.0),
@@ -350,7 +350,7 @@ def test_deviation_from_normal_positive_when_warmer_than_baseline():
     assert result.current.deviation_from_normal == pytest.approx(3.0)
 
 
-def test_deviation_from_normal_negative_when_colder_than_baseline():
+def test_deviation_from_normal_negative_when_colder_than_baseline() -> None:
     result = get_national_indicator_kpi(
         observed_data_source=AnyDateObservedDataSource(temperature=6.0),
         baseline_data_source=AnyDateBaselineDataSource(mean=10.0, std_dev=2.0),
@@ -360,7 +360,7 @@ def test_deviation_from_normal_negative_when_colder_than_baseline():
     assert result.current.deviation_from_normal == pytest.approx(-4.0)
 
 
-def test_deviation_from_normal_is_none_when_observed_series_is_empty():
+def test_deviation_from_normal_is_none_when_observed_series_is_empty() -> None:
     result = get_national_indicator_kpi(
         observed_data_source=StubObservedDataSource([]),
         baseline_data_source=StubBaselineDataSource({}),

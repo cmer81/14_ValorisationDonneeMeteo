@@ -96,7 +96,7 @@ def normalize_department(department: int) -> str:
     return f"{department:02d}"
 
 
-def _float_or_none(value) -> float | None:
+def _float_or_none(value: int | float | None) -> float | None:
     return float(value) if value is not None else None
 
 
@@ -114,7 +114,7 @@ def _normalize_reims(
     return m
 
 
-def _station_daily_baseline_subquery():
+def _station_daily_baseline_subquery() -> float:
     return BaselineStationDailyMean19912020.objects.filter(
         station_code=OuterRef("station_code"),
         month=OuterRef("month"),
@@ -122,7 +122,7 @@ def _station_daily_baseline_subquery():
     ).values("baseline_mean_tntxm")[:1]
 
 
-def _station_name_subquery():
+def _station_name_subquery() -> str:
     return Station.objects.filter(station_code=OuterRef("station_code")).values("name")[
         :1
     ]
@@ -306,7 +306,7 @@ class TimescaleTemperatureDeviationDailyDataSource(
     TemperatureDeviationDailyDataSource,
     TemperatureDeviationOverviewDataSource,
 ):
-    def _baseline_subquery(self):
+    def _baseline_subquery(self) -> float:
         return BaselineStationDailyMean19912020.objects.filter(
             station_code=OuterRef("station_code"),
             month=OuterRef("month"),

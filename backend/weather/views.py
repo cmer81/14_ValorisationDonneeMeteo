@@ -4,6 +4,7 @@ DRF ViewSets for weather data API endpoints.
 
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import status, viewsets
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -15,7 +16,10 @@ from weather.bootstrap_temperature_deviation import (
 )
 from weather.bootstrap_temperature_minmax import TemperatureMinMaxDependencyProvider
 from weather.bootstrap_temperature_records import TemperatureRecordsDependencyProvider
-from weather.services.national_indicator.kpi_use_case import get_national_indicator_kpi
+from weather.services.national_indicator.kpi_use_case import (
+    NationalIndicatorKpiResult,
+    get_national_indicator_kpi,
+)
 from weather.services.national_indicator.use_case import get_national_indicator
 from weather.services.records_graph.types import RecordsGraphRequest
 from weather.services.records_graph.use_case import get_records_graph
@@ -84,7 +88,7 @@ class StationViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = ["name", "departement", "alt"]
     ordering = ["name"]
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> StationDetailSerializer:
         if self.action == "retrieve":
             return StationDetailSerializer
         return StationSerializer
@@ -99,7 +103,7 @@ class NationalIndicatorAPIView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    def get(self, request):
+    def get(self, request: Request) -> dict:
         q = NationalIndicatorQuerySerializer(data=request.query_params)
         if not q.is_valid():
             return Response(
@@ -152,7 +156,7 @@ class TemperatureDeviationGraphAPIView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    def get(self, request):
+    def get(self, request: Request) -> dict:
         q = TemperatureDeviationGraphQuerySerializer(data=request.query_params)
         if not q.is_valid():
             return Response(
@@ -256,7 +260,7 @@ class TemperatureRecordsAPIView(APIView):
             }
         ],
     )
-    def get(self, request):
+    def get(self, request: Request) -> Response:
         q = TemperatureRecordsQuerySerializer(data=request.query_params)
         if not q.is_valid():
             return Response(
@@ -365,7 +369,7 @@ class TemperatureMinMaxGraphAPIView(APIView):
             OpenApiParameter("regions", str, OpenApiParameter.QUERY, required=False),
         ]
     )
-    def get(self, request):
+    def get(self, request: Request) -> Response:
         q = TemperatureMinMaxGraphQuerySerializer(data=request.query_params)
         if not q.is_valid():
             return Response(
@@ -404,7 +408,7 @@ class TemperatureDeviationOverviewAPIView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    def get(self, request):
+    def get(self, request: Request) -> Response:
         q = TemperatureDeviationOverviewQuerySerializer(data=request.query_params)
         if not q.is_valid():
             return Response(
@@ -469,7 +473,7 @@ class NationalIndicatorKpiAPIView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    def get(self, request):
+    def get(self, request: Request) -> Response:
         q = NationalIndicatorKpiQuerySerializer(data=request.query_params)
         if not q.is_valid():
             return Response(
@@ -491,7 +495,7 @@ class NationalIndicatorKpiAPIView(APIView):
             date_end=params["date_end"],
         )
 
-        def period_payload(stats):
+        def period_payload(stats: NationalIndicatorKpiResult) -> Response:
             return {
                 "hot_peak_count": stats.hot_peak_count,
                 "cold_peak_count": stats.cold_peak_count,
@@ -522,7 +526,7 @@ class RecordsGraphAPIView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    def get(self, request):
+    def get(self, request: Request) -> Response:
         q = RecordsGraphQuerySerializer(data=request.query_params)
         if not q.is_valid():
             return Response(

@@ -62,7 +62,7 @@ class NationalIndicatorQuerySerializer(serializers.Serializer):
     month_of_year = serializers.IntegerField(required=False, min_value=1, max_value=12)
     day_of_month = serializers.IntegerField(required=False, min_value=1, max_value=31)
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict) -> dict:
         ds = attrs["date_start"]
         de = attrs["date_end"]
         if ds > de:
@@ -174,7 +174,7 @@ class NationalIndicatorResponseSerializer(serializers.Serializer):
 
 
 class CommaSeparatedStringListField(serializers.Field):
-    def to_internal_value(self, data):
+    def to_internal_value(self, data: list | tuple | str) -> tuple:
         if data is None:
             return ()
         if isinstance(data, list | tuple):
@@ -293,7 +293,7 @@ class TemperatureDeviationGraphQuerySerializer(serializers.Serializer):
                     {"month_of_year": "Interdit si granularity=month."}
                 )
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict) -> dict:
         date_start = attrs["date_start"]
         date_end = attrs["date_end"]
         if date_start > date_end:
@@ -424,7 +424,7 @@ class TemperatureRecordsQuerySerializer(serializers.Serializer):
     date_de_fermeture_min = serializers.DateField(required=False, allow_null=True)
     date_de_fermeture_max = serializers.DateField(required=False, allow_null=True)
 
-    def validate_sort(self, value) -> str:
+    def validate_sort(self, value: str) -> str:
         """Valide le format du paramètre sort."""
         if not value:
             return value
@@ -441,7 +441,7 @@ class TemperatureRecordsQuerySerializer(serializers.Serializer):
 
         return value
 
-    def validate(self, attrs) -> dict:
+    def validate(self, attrs: dict) -> dict:
         date_start = attrs.get("date_start")
         date_end = attrs.get("date_end")
         territoire = attrs.get("territoire", "france")
@@ -572,7 +572,7 @@ class TemperatureDeviationOverviewQuerySerializer(serializers.Serializer):
     )
     offset = serializers.IntegerField(required=False, min_value=0, default=0)
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict) -> dict:
         ds = attrs["date_start"]
         de = attrs["date_end"]
         if ds > de:
@@ -728,7 +728,7 @@ class NationalIndicatorKpiQuerySerializer(serializers.Serializer):
     date_start = serializers.DateField(required=True)
     date_end = serializers.DateField(required=True)
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict) -> dict:
         if attrs["date_start"] > attrs["date_end"]:
             raise serializers.ValidationError(
                 {"date_end": "date_end doit être >= date_start."}
@@ -781,7 +781,7 @@ class RecordsGraphQuerySerializer(serializers.Serializer):
     )
     territoire_id = serializers.CharField(required=False)
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict) -> dict:
         territoire = attrs.get("territoire", "france")
 
         if territoire != "france" and not attrs.get("territoire_id"):
@@ -823,7 +823,7 @@ class TemperatureMinMaxGraphQuerySerializer(serializers.Serializer):
     departments = CommaSeparatedStringListField(required=False)
     regions = CommaSeparatedStringListField(required=False)
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict) -> dict:
         ds = attrs["date_start"]
         de = attrs["date_end"]
         if ds > de:
